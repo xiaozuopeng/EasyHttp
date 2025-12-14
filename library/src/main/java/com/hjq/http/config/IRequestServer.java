@@ -1,9 +1,8 @@
 package com.hjq.http.config;
 
 import androidx.annotation.NonNull;
-
-import com.hjq.http.model.RequestBodyType;
 import com.hjq.http.model.CacheMode;
+import com.hjq.http.model.RequestBodyType;
 
 /**
  *    author : Android 轮子哥
@@ -17,7 +16,7 @@ public interface IRequestServer extends
 
     @NonNull
     @Override
-    default IHttpPostBodyStrategy getBodyType() {
+    default IHttpBodyStrategy getBodyType() {
         // 默认以表单的方式提交
         return RequestBodyType.FORM;
     }

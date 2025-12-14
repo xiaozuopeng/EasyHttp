@@ -2,7 +2,7 @@ package com.hjq.http.config.impl;
 
 import com.hjq.http.EasyUtils;
 import com.hjq.http.body.JsonRequestBody;
-import com.hjq.http.config.IHttpPostBodyStrategy;
+import com.hjq.http.config.IHttpBodyStrategy;
 import com.hjq.http.model.HttpParams;
 import com.hjq.http.request.HttpRequest;
 import okhttp3.RequestBody;
@@ -13,7 +13,7 @@ import okhttp3.RequestBody;
  *    time   : 2023/09/23
  *    desc   : RequestBody Json 策略实现接口
  */
-public class HttpPostJsonBodyStrategy implements IHttpPostBodyStrategy {
+public class HttpJsonBodyStrategy implements IHttpBodyStrategy {
 
     @Override
     public void addParams(HttpParams params, String key, Object value) {

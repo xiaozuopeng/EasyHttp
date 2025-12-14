@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleOwner;
 import com.hjq.http.EasyLog;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.callback.DownloadCallback;
-import com.hjq.http.config.IHttpPostBodyStrategy;
+import com.hjq.http.config.IHttpBodyStrategy;
 import com.hjq.http.config.impl.SimpleRequestUrl;
 import com.hjq.http.lifecycle.HttpLifecycleManager;
 import com.hjq.http.listener.OnDownloadListener;
@@ -207,28 +207,29 @@ public final class DownloadRequest extends HttpRequest<DownloadRequest> {
         return String.valueOf(mMethod);
     }
 
+    @NonNull
     @Override
-    protected Request createRequest(String url, String tag, HttpParams params, HttpHeaders headers, IHttpPostBodyStrategy requestBodyStrategy) {
+    protected Request createRequest(String url, String tag, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
         if (mResumableTransfer && mFile.isFile() && mFile.length() > 0) {
             // 添加断点续传请求头
             headers.put("Range", "bytes=" + mFile.length() + "-");
         }
         // 这里设置 api 的目的是为了打日志的时候不崩溃，因为现在打日志需要 api 对象
-        return mRealRequest.api(getRequestApi()).createRequest(url, tag, params, headers, requestBodyStrategy);
+        return mRealRequest.api(getRequestApi()).createRequest(url, tag, params, headers, bodyStrategy);
     }
 
     @Override
-    protected void addHttpParams(HttpParams params, String key, Object value, IHttpPostBodyStrategy requestBodyStrategy) {
-        mRealRequest.addHttpParams(params, key, value, requestBodyStrategy);
+    protected void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy) {
+        mRealRequest.addHttpParams(params, key, value, bodyStrategy);
     }
 
     @Override
-    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpPostBodyStrategy requestBodyStrategy) {
-        mRealRequest.addRequestParams(requestBuilder, params, contentType, requestBodyStrategy);
+    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+        mRealRequest.addRequestParams(requestBuilder, params, contentType, bodyStrategy);
     }
 
     @Override
-    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, IHttpPostBodyStrategy requestBodyStrategy) {
-        mRealRequest.printRequestLog(request, params, headers, requestBodyStrategy);
+    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+        mRealRequest.printRequestLog(request, params, headers, bodyStrategy);
     }
 }

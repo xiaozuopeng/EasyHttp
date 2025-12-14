@@ -1,5 +1,6 @@
 package com.hjq.http.request;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import com.hjq.http.EasyConfig;
@@ -9,7 +10,7 @@ import com.hjq.http.body.CustomTypeRequestBody;
 import com.hjq.http.body.JsonRequestBody;
 import com.hjq.http.body.ProgressMonitorRequestBody;
 import com.hjq.http.body.TextRequestBody;
-import com.hjq.http.config.IHttpPostBodyStrategy;
+import com.hjq.http.config.IHttpBodyStrategy;
 import com.hjq.http.listener.OnHttpListener;
 import com.hjq.http.listener.OnUpdateListener;
 import com.hjq.http.model.HttpHeaders;
@@ -96,21 +97,18 @@ public abstract class BodyRequest<T extends BodyRequest<?>> extends HttpRequest<
     }
 
     @Override
-    protected void addHttpParams(HttpParams params, String key, Object value,
-                                    IHttpPostBodyStrategy requestBodyStrategy) {
-        requestBodyStrategy.addParams(params, key, value);
+    protected void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy) {
+        bodyStrategy.addParams(params, key, value);
     }
 
     @Override
-    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params,
-                                    @Nullable String contentType, IHttpPostBodyStrategy requestBodyStrategy) {
-        RequestBody body = mRequestBody != null ? mRequestBody : createRequestBody(params, contentType, requestBodyStrategy);
+    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+        RequestBody body = mRequestBody != null ? mRequestBody : createRequestBody(params, contentType, bodyStrategy);
         requestBuilder.method(getRequestMethod(), body);
     }
 
     @Override
-    protected void printRequestLog(Request request, HttpParams params,
-                                    HttpHeaders headers, IHttpPostBodyStrategy requestBodyStrategy) {
+    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
         if (!EasyConfig.getInstance().isLogEnabled()) {
             return;
         }
@@ -183,9 +181,8 @@ public abstract class BodyRequest<T extends BodyRequest<?>> extends HttpRequest<
     /**
      * 组装 RequestBody 对象
      */
-    private RequestBody createRequestBody(HttpParams params, @Nullable String contentType,
-                                            IHttpPostBodyStrategy requestBodyStrategy) {
-        RequestBody requestBody = requestBodyStrategy.createRequestBody(this, params);
+    private RequestBody createRequestBody(HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+        RequestBody requestBody = bodyStrategy.createRequestBody(this, params);
 
         // 如果外层需要自定义 Content-Type 这个字段，那么就使用装饰设计模式，对原有的 RequestBody 对象进行扩展
         if (contentType != null && !contentType.isEmpty()) {

@@ -14,5 +14,5 @@ public interface IRequestBodyType {
      * 获取参数的提交类型
      */
     @NonNull
-    IHttpPostBodyStrategy getBodyType();
+    IHttpBodyStrategy getBodyType();
 }
