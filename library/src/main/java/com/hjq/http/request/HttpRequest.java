@@ -55,6 +55,7 @@ import okhttp3.Response;
 public abstract class HttpRequest<T extends HttpRequest<?>> {
 
     /** 请求生命周期控制 */
+    @NonNull
     private final LifecycleOwner mLifecycleOwner;
 
     /** 请求接口配置 */
@@ -85,20 +86,22 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     private ThreadSchedulers mThreadSchedulers = EasyConfig.getInstance().getThreadSchedulers();
 
     /** 请求执行代理类 */
+    @Nullable
     private CallProxy mCallProxy;
 
     /** 请求标记 */
+    @Nullable
     private String mTag;
 
     /** 请求延迟 */
     private long mDelayMillis;
 
-    public HttpRequest(LifecycleOwner lifecycleOwner) {
+    public HttpRequest(@NonNull LifecycleOwner lifecycleOwner) {
         mLifecycleOwner = lifecycleOwner;
         tag(lifecycleOwner);
     }
 
-    public T api(Class<? extends IRequestApi> api) {
+    public T api(@NonNull Class<? extends IRequestApi> api) {
         try {
             return api(api.newInstance());
         } catch (InstantiationException e) {
@@ -108,14 +111,14 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
         }
     }
 
-    public T api(String api) {
+    public T api(@NonNull String api) {
         return api(new SimpleRequestApi(api));
     }
 
     /**
      * 设置请求配置
      */
-    public T api(IRequestApi api) {
+    public T api(@NonNull IRequestApi api) {
         mRequestApi = api;
         if (api instanceof IRequestHost) {
             mRequestHost = (IRequestHost) api;
@@ -141,7 +144,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
         return (T) this;
     }
 
-    public T server(Class<? extends IRequestServer> server) {
+    public T server(@NonNull Class<? extends IRequestServer> server) {
         try {
             return server(server.newInstance());
         } catch (InstantiationException e) {
@@ -151,14 +154,14 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
         }
     }
 
-    public T server(String host) {
+    public T server(@NonNull String host) {
         return server(new SimpleRequestServer(host));
     }
 
     /**
      * 替换默认的服务器配器（推荐使用 api 的方式来替代 server，具体实现可见 api 方法源码）
      */
-    public T server(IRequestServer server) {
+    public T server(@NonNull IRequestServer server) {
         mRequestHost = server;
         mRequestHttpClient = server;
         mRequestBodyType = server;
@@ -190,7 +193,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
         return (T) this;
     }
 
-    public T delay(long delay, TimeUnit unit) {
+    public T delay(long delay, @NonNull TimeUnit unit) {
         return delay(unit.toMillis(delay));
     }
 
@@ -207,11 +210,11 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 设置请求的标记（可用于 {@link EasyHttp#cancelByTag(String)}）
      */
-    public T tag(Object tag) {
+    public T tag(@Nullable Object tag) {
         return tag(EasyUtils.getObjectTag(tag));
     }
 
-    public T tag(String tag) {
+    public T tag(@Nullable String tag) {
         mTag = tag;
         return (T) this;
     }
@@ -247,6 +250,10 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
         }
 
         for (Field field : fields) {
+            if (field == null) {
+                continue;
+            }
+
             // 允许访问私有字段
             field.setAccessible(true);
 
@@ -391,7 +398,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
                             .setCallProxyFactory(() -> {
                                 // 如果存在缓存的情况下，则后面的逻辑不会继续请求，可以直接使用 CallProxy 对象字段
                                 // 如果不存在缓存的话，则重新 new 一个 CallProxy 对象，这是因为后面的逻辑会请重新发起网络请求
-                                if (cacheResult != null) {
+                                if (cacheResult != null && mCallProxy != null) {
                                     return mCallProxy;
                                 }
                                 return new CallProxy(createCall()) ;
@@ -564,7 +571,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
      * @param delayMillis       延迟时间
      * @param tag               任务标记
      */
-    protected void sendRunnable(Runnable runnable, long delayMillis, String tag) {
+    protected void sendRunnable(@NonNull Runnable runnable, long delayMillis, @Nullable String tag) {
         if (delayMillis > 0) {
             // issue 地址：https://github.com/getActivity/EasyHttp/issues/159
             int what = tag == null ? Integer.MAX_VALUE : tag.hashCode();
@@ -584,7 +591,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 打印键值对
      */
-    protected void printKeyValue(String key, Object value) {
+    protected void printKeyValue(@Nullable String key, @Nullable Object value) {
         if (value instanceof Enum) {
             // 如果这是一个枚举类型
             EasyLog.printKeyValue(this, key, "\"" + value + "\"");
@@ -598,7 +605,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 添加请求头
      */
-    protected void addHttpHeaders(HttpHeaders headers, String key, Object value) {
+    protected void addHttpHeaders(@NonNull HttpHeaders headers, @Nullable String key, @Nullable Object value) {
         if (value instanceof Map) {
             Map<?, ?> map = ((Map<?, ?>) value);
             for (Object o : map.keySet()) {
@@ -614,13 +621,15 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 添加请求参数
      */
-    protected abstract void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy);
+    protected abstract void addHttpParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value,
+                                          @NonNull IHttpBodyStrategy bodyStrategy);
 
     /**
      * 创建请求的对象
      */
     @NonNull
-    protected Request createRequest(String url, String tag, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected Request createRequest(@NonNull String url, @Nullable String tag, @NonNull HttpParams params,
+                                    @NonNull HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
         Request.Builder requestBuilder = createRequestBuilder(url, tag);
         addRequestHeader(requestBuilder, headers);
 
@@ -636,7 +645,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
      * 创建请求构建对象
      */
     @NonNull
-    protected Request.Builder createRequestBuilder(String url, String tag) {
+    protected Request.Builder createRequestBuilder(@NonNull String url, @Nullable String tag) {
         Request.Builder requestBuilder = new Request.Builder();
         requestBuilder.url(url);
         if (tag != null) {
@@ -653,7 +662,7 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 添加请求头
      */
-    protected void addRequestHeader(Request.Builder requestBuilder, HttpHeaders headers) {
+    protected void addRequestHeader(@NonNull Request.Builder requestBuilder, @NonNull HttpHeaders headers) {
         if (headers.isEmpty()) {
             return;
         }
@@ -674,12 +683,14 @@ public abstract class HttpRequest<T extends HttpRequest<?>> {
     /**
      * 添加请求参数
      */
-    protected abstract void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy);
+    protected abstract void addRequestParams(@NonNull Request.Builder requestBuilder, @NonNull HttpParams params,
+                                             @Nullable String contentType, @NonNull IHttpBodyStrategy bodyStrategy);
 
     /**
      * 打印请求日志
      */
-    protected abstract void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy);
+    protected abstract void printRequestLog(@NonNull Request request, HttpParams params, @NonNull HttpHeaders headers,
+                                            @NonNull IHttpBodyStrategy bodyStrategy);
 
     /**
      * 生成日志的 TAG

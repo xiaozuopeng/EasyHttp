@@ -1,5 +1,7 @@
 package com.hjq.http.config;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.model.HttpParams;
 import com.hjq.http.request.HttpRequest;
 import okhttp3.RequestBody;
@@ -15,10 +17,11 @@ public interface IHttpBodyStrategy {
     /**
      * 添加参数
      */
-    void addParams(HttpParams params, String key, Object value);
+    void addParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value);
 
     /**
      * 创建 RequestBody
      */
-    RequestBody createRequestBody(HttpRequest<?> httpRequest, HttpParams params);
+    @NonNull
+    RequestBody createRequestBody(@NonNull HttpRequest<?> httpRequest, @NonNull HttpParams params);
 }

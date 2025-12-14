@@ -1,6 +1,7 @@
 package com.hjq.http.config;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.request.HttpRequest;
 import java.lang.reflect.Type;
@@ -52,6 +53,7 @@ public interface IRequestHandler {
     /**
      * 解析泛型
      */
+    @Nullable
     default Type getGenericType(Object object) {
         return EasyUtils.getGenericType(object);
     }

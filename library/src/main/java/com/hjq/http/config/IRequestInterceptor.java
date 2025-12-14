@@ -1,11 +1,9 @@
 package com.hjq.http.config;
 
 import androidx.annotation.NonNull;
-
 import com.hjq.http.model.HttpHeaders;
 import com.hjq.http.model.HttpParams;
 import com.hjq.http.request.HttpRequest;
-
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -46,7 +44,7 @@ public interface IRequestInterceptor {
      * @return              返回新的响应头
      */
     @NonNull
-    default Response interceptResponse(HttpRequest<?> httpRequest, Response response) {
+    default Response interceptResponse(@NonNull HttpRequest<?> httpRequest, @NonNull Response response) {
         return response;
     }
 }

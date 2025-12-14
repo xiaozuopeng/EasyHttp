@@ -1,11 +1,13 @@
 package com.hjq.http.callback;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyConfig;
 import com.hjq.http.EasyLog;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.lifecycle.HttpLifecycleManager;
 import com.hjq.http.model.CallProxy;
+import com.hjq.http.model.CallProxyFactory;
 import com.hjq.http.model.ThreadSchedulers;
 import com.hjq.http.request.HttpRequest;
 import java.io.Closeable;
@@ -26,12 +28,15 @@ import okhttp3.Response;
 public abstract class BaseCallback implements Callback {
 
     /** 请求配置 */
+    @NonNull
     private final HttpRequest<?> mHttpRequest;
 
     /** 请求任务对象创建工厂 */
-    private CallProxy.Factory mCallProxyFactory;
+    @Nullable
+    private CallProxyFactory mCallProxyFactory;
 
     /** 请求任务对象 */
+    @Nullable
     private CallProxy mCallProxy;
 
     /** 当前重试次数 */
@@ -44,21 +49,25 @@ public abstract class BaseCallback implements Callback {
                 () -> HttpLifecycleManager.register(mHttpRequest.getLifecycleOwner()));
     }
 
-    public BaseCallback setCallProxyFactory(CallProxy.Factory factory) {
+    public BaseCallback setCallProxyFactory(@NonNull CallProxyFactory factory) {
         mCallProxyFactory = factory;
         return this;
     }
 
     public void start() {
         onStart();
-        mCallProxy = mCallProxyFactory.create();
         try {
+            if (mCallProxyFactory == null) {
+                throw new IllegalStateException("CallProxyFactory must not be null");
+            }
+            mCallProxy = mCallProxyFactory.create();
             mCallProxy.enqueue(this);
         } catch (Throwable throwable) {
             onHttpFailure(throwable);
         }
     }
 
+    @Nullable
     protected CallProxy getCallProxy() {
         return mCallProxy;
     }
@@ -82,7 +91,7 @@ public abstract class BaseCallback implements Callback {
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException e) {
         // 服务器请求超时重试
-        if (e instanceof SocketTimeoutException && mRetryCount < EasyConfig.getInstance().getRetryCount()) {
+        if (e instanceof SocketTimeoutException && mRetryCount < EasyConfig.getInstance().getRetryCount() && mCallProxy != null) {
             // 设置延迟 N 秒后重试该请求
             EasyUtils.postDelayedRunnable(() -> {
 
@@ -116,17 +125,20 @@ public abstract class BaseCallback implements Callback {
     /**
      * 请求成功
      */
-    protected abstract void onHttpResponse(Response response) throws Throwable;
+    protected abstract void onHttpResponse(@NonNull Response response) throws Throwable;
 
     /**
      * 请求失败
      */
-    protected abstract void onHttpFailure(Throwable e);
+    protected abstract void onHttpFailure(@NonNull Throwable e);
 
     /**
      * 关闭请求体
      */
-    protected void closeRequest(Request request) {
+    protected void closeRequest(@Nullable Request request) {
+        if (request == null) {
+            return;
+        }
         RequestBody body = request.body();
         if (body == null) {
             return;
@@ -141,7 +153,10 @@ public abstract class BaseCallback implements Callback {
     /**
      * 关闭响应体
      */
-    protected void closeResponse(Response response) {
+    protected void closeResponse(@Nullable Response response) {
+        if (response == null) {
+            return;
+        }
         EasyUtils.closeStream(response);
     }
 }

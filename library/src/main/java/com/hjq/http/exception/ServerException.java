@@ -1,5 +1,7 @@
 package com.hjq.http.exception;
 
+import androidx.annotation.NonNull;
+
 /**
  *    author : Android 轮子哥
  *    github : https://github.com/getActivity/EasyHttp
@@ -8,11 +10,11 @@ package com.hjq.http.exception;
  */
 public final class ServerException extends HttpException {
 
-    public ServerException(String message) {
+    public ServerException(@NonNull String message) {
         super(message);
     }
 
-    public ServerException(String message, Throwable cause) {
+    public ServerException(@NonNull String message, @NonNull Throwable cause) {
         super(message, cause);
     }
 }

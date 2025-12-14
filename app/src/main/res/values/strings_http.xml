@@ -11,5 +11,6 @@
     <string name="http_request_cancel">Request interrupted, please try again</string>
     <string name="http_response_null_body">Server data return exception, please try again later</string>
     <string name="http_response_md5_error">File md5 verification failed</string>
+    <string name="http_response_file_stream_exception">File stream read and write anomalies</string>
 
 </resources>

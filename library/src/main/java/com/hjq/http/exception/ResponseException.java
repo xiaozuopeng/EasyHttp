@@ -1,5 +1,6 @@
 package com.hjq.http.exception;
 
+import androidx.annotation.NonNull;
 import okhttp3.Response;
 
 /**
@@ -10,18 +11,20 @@ import okhttp3.Response;
  */
 public final class ResponseException extends HttpException {
 
+    @NonNull
     private final Response mResponse;
 
-    public ResponseException(String message, Response response) {
+    public ResponseException(@NonNull String message, @NonNull Response response) {
         super(message);
         mResponse = response;
     }
 
-    public ResponseException(String message, Throwable cause, Response response) {
+    public ResponseException(@NonNull String message, @NonNull Throwable cause, @NonNull Response response) {
         super(message, cause);
         mResponse = response;
     }
 
+    @NonNull
     public Response getResponse() {
         return mResponse;
     }

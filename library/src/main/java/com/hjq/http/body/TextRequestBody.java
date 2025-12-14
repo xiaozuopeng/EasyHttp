@@ -1,6 +1,7 @@
 package com.hjq.http.body;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.model.ContentType;
 import java.io.IOException;
 import okhttp3.MediaType;
@@ -16,20 +17,23 @@ import okio.BufferedSink;
 public class TextRequestBody extends RequestBody {
 
     /** 字符串数据 */
+    @NonNull
     private final String mText;
 
     /** 字节数组 */
+    @NonNull
     private final byte[] mBytes;
 
     public TextRequestBody() {
         this("");
     }
 
-    public TextRequestBody(String text) {
+    public TextRequestBody(@NonNull String text) {
         mText = text;
         mBytes = mText.getBytes();
     }
 
+    @Nullable
     @Override
     public MediaType contentType() {
         return ContentType.TEXT;
@@ -42,7 +46,7 @@ public class TextRequestBody extends RequestBody {
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+    public void writeTo(@NonNull BufferedSink sink) throws IOException {
         sink.write(mBytes, 0, mBytes.length);
     }
 

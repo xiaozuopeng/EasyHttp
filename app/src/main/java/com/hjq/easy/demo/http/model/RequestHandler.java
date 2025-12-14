@@ -17,6 +17,7 @@ import com.hjq.http.config.IRequestHandler;
 import com.hjq.http.exception.CancelException;
 import com.hjq.http.exception.DataException;
 import com.hjq.http.exception.FileMd5Exception;
+import com.hjq.http.exception.FileStreamException;
 import com.hjq.http.exception.HttpException;
 import com.hjq.http.exception.NetworkException;
 import com.hjq.http.exception.NullBodyException;
@@ -53,6 +54,10 @@ public final class RequestHandler implements IRequestHandler {
     @NonNull
     @Override
     public Object requestSuccess(@NonNull HttpRequest<?> httpRequest, @NonNull Response response, @NonNull Type type) throws Throwable {
+        if (Void.class.equals(type)) {
+            return Void.TYPE;
+        }
+
         if (Response.class.equals(type)) {
             return response;
         }
@@ -182,19 +187,23 @@ public final class RequestHandler implements IRequestHandler {
     @Override
     public Throwable downloadFail(@NonNull HttpRequest<?> httpRequest, @NonNull Throwable throwable) {
         if (throwable instanceof ResponseException) {
-            ResponseException responseException = ((ResponseException) throwable);
-            Response response = responseException.getResponse();
-            responseException.setMessage(String.format(mApplication.getString(R.string.http_response_error),
+            ResponseException exception = ((ResponseException) throwable);
+            Response response = exception.getResponse();
+            exception.setMessage(String.format(mApplication.getString(R.string.http_response_error),
                     response.code(), response.message()));
-            return responseException;
+            return exception;
         } else if (throwable instanceof NullBodyException) {
-            NullBodyException nullBodyException = ((NullBodyException) throwable);
-            nullBodyException.setMessage(mApplication.getString(R.string.http_response_null_body));
-            return nullBodyException;
+            NullBodyException exception = ((NullBodyException) throwable);
+            exception.setMessage(mApplication.getString(R.string.http_response_null_body));
+            return exception;
         } else if (throwable instanceof FileMd5Exception) {
-            FileMd5Exception fileMd5Exception = ((FileMd5Exception) throwable);
-            fileMd5Exception.setMessage(mApplication.getString(R.string.http_response_md5_error));
-            return fileMd5Exception;
+            FileMd5Exception exception = ((FileMd5Exception) throwable);
+            exception.setMessage(mApplication.getString(R.string.http_response_md5_error));
+            return exception;
+        } else if (throwable instanceof FileStreamException) {
+            FileStreamException exception = ((FileStreamException) throwable);
+            exception.setMessage(mApplication.getString(R.string.http_response_md5_error));
+            return exception;
         }
         return requestFail(httpRequest, throwable);
     }

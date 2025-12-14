@@ -1,6 +1,7 @@
 package com.hjq.http.callback;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyLog;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.config.IRequestInterceptor;
@@ -24,10 +25,15 @@ import okhttp3.ResponseBody;
 public final class NormalCallback extends BaseCallback {
 
     /** 请求配置 */
+    @NonNull
     private final HttpRequest mHttpRequest;
+
     /** 接口回调 */
+    @Nullable
     private OnHttpListener mListener;
+
     /** 解析类型 */
+    @Nullable
     private Type mReflectType;
 
     public NormalCallback(@NonNull HttpRequest request) {
@@ -35,13 +41,13 @@ public final class NormalCallback extends BaseCallback {
         mHttpRequest = request;
     }
 
-    public NormalCallback setListener(OnHttpListener listener) {
+    public NormalCallback setListener(@Nullable OnHttpListener listener) {
         mListener = listener;
         mReflectType = mHttpRequest.getRequestHandler().getGenericType(mListener);
         return this;
     }
 
-    public NormalCallback setReflectType(Type reflectType) {
+    public NormalCallback setReflectType(@Nullable Type reflectType) {
         mReflectType = reflectType;
         return this;
     }
@@ -55,9 +61,11 @@ public final class NormalCallback extends BaseCallback {
             return;
         }
 
+        Type reflectType = mReflectType != null ? mReflectType : Void.TYPE;
+
         try {
-            Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest,
-                    mReflectType, mHttpRequest.getRequestCacheConfig().getCacheTime());
+            Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest, reflectType,
+                                                                          mHttpRequest.getRequestCacheConfig().getCacheTime());
             EasyLog.printLog(mHttpRequest, "ReadCache result：" + result);
 
             // 如果没有缓存，就请求网络
@@ -97,7 +105,7 @@ public final class NormalCallback extends BaseCallback {
     }
 
     @Override
-    protected void onHttpResponse(Response response) throws Throwable {
+    protected void onHttpResponse(@NonNull Response response) throws Throwable {
         // 打印请求耗时时间
         EasyLog.printLog(mHttpRequest, "RequestConsuming：" +
                 (response.receivedResponseAtMillis() - response.sentRequestAtMillis()) + " ms");
@@ -128,14 +136,15 @@ public final class NormalCallback extends BaseCallback {
     }
 
     @Override
-    protected void onHttpFailure(Throwable throwable) {
+    protected void onHttpFailure(@NonNull Throwable throwable) {
         // 打印错误堆栈
         EasyLog.printThrowable(mHttpRequest, throwable);
         // 如果设置了只在网络请求失败才去读缓存
         if (throwable instanceof IOException && mHttpRequest.getRequestCacheConfig().getCacheMode() == CacheMode.USE_CACHE_AFTER_FAILURE) {
             try {
-                Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest,
-                        mReflectType, mHttpRequest.getRequestCacheConfig().getCacheTime());
+                Type reflectType = mReflectType != null ? mReflectType : Void.TYPE;
+                Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest, reflectType,
+                                                                              mHttpRequest.getRequestCacheConfig().getCacheTime());
                 EasyLog.printLog(mHttpRequest, "ReadCache result：" + result);
                 if (result != null) {
                     EasyUtils.runOnAssignThread(mHttpRequest.getThreadSchedulers(), () -> dispatchHttpSuccessCallback(result, true));

@@ -3,7 +3,6 @@ package com.hjq.http.lifecycle;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
@@ -18,6 +17,7 @@ import androidx.lifecycle.LifecycleRegistry;
  */
 public abstract class LifecycleService extends Service implements LifecycleOwner {
 
+    @NonNull
     private final LifecycleRegistry mLifecycle = new LifecycleRegistry(this);
 
     @NonNull

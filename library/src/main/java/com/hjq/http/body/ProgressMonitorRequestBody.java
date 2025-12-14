@@ -1,6 +1,7 @@
 package com.hjq.http.body;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import com.hjq.http.EasyLog;
 import com.hjq.http.EasyUtils;
@@ -23,6 +24,7 @@ import okio.Sink;
  */
 public class ProgressMonitorRequestBody extends WrapperRequestBody {
 
+    @NonNull
     private final HttpRequest<?> mHttpRequest;
     private final OnUpdateListener<?> mListener;
     private final LifecycleOwner mLifecycleOwner;
@@ -34,8 +36,9 @@ public class ProgressMonitorRequestBody extends WrapperRequestBody {
     /** 上传进度值 */
     private int mUpdateProgress;
 
-    public ProgressMonitorRequestBody(HttpRequest<?> httpRequest, RequestBody body, LifecycleOwner lifecycleOwner, OnUpdateListener<?> listener) {
-        super(body);
+    public ProgressMonitorRequestBody(@NonNull HttpRequest<?> httpRequest, @NonNull RequestBody realRequestBody,
+                                      @NonNull LifecycleOwner lifecycleOwner, @Nullable OnUpdateListener<?> listener) {
+        super(realRequestBody);
         mHttpRequest = httpRequest;
         mLifecycleOwner = lifecycleOwner;
         mListener = listener;
@@ -45,18 +48,18 @@ public class ProgressMonitorRequestBody extends WrapperRequestBody {
     public void writeTo(@NonNull BufferedSink sink) throws IOException {
         mTotalByte = contentLength();
         sink = Okio.buffer(new WrapperSink(sink));
-        getRequestBody().writeTo(sink);
+        getRealRequestBody().writeTo(sink);
         sink.flush();
     }
 
     private class WrapperSink extends ForwardingSink {
 
-        public WrapperSink(Sink delegate) {
+        public WrapperSink(@NonNull Sink delegate) {
             super(delegate);
         }
 
         @Override
-        public void write(Buffer source, long byteCount) throws IOException {
+        public void write(@NonNull Buffer source, long byteCount) throws IOException {
             super.write(source, byteCount);
             mUpdateByte += byteCount;
 

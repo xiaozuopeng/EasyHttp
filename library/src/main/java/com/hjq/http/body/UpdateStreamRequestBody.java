@@ -1,5 +1,7 @@
 package com.hjq.http.body;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.model.ContentType;
 import java.io.Closeable;
 import java.io.File;
@@ -21,26 +23,29 @@ import okio.Source;
 public class UpdateStreamRequestBody extends RequestBody implements Closeable {
 
     /** 上传源 */
+    @NonNull
     private final Source mSource;
 
     /** 内容类型 */
+    @Nullable
     private final MediaType mMediaType;
 
     /** 内容名称 */
+    @Nullable
     private final String mKeyName;
 
     /** 内容大小 */
     private final long mLength;
 
-    public UpdateStreamRequestBody(File file) throws FileNotFoundException {
+    public UpdateStreamRequestBody(@NonNull File file) throws FileNotFoundException {
         this(Okio.source(file), ContentType.guessMimeType(file.getName()), file.getName(), file.length());
     }
 
-    public UpdateStreamRequestBody(InputStream inputStream, String name) throws IOException {
+    public UpdateStreamRequestBody(@NonNull InputStream inputStream, @Nullable String name) throws IOException {
         this(Okio.source(inputStream), ContentType.STREAM, name, inputStream.available());
     }
 
-    public UpdateStreamRequestBody(Source source, MediaType type, String name, long length) {
+    public UpdateStreamRequestBody(@NonNull Source source, @Nullable MediaType type, @Nullable String name, long length) {
         mSource = source;
         mMediaType = type;
         mKeyName = name;
@@ -62,7 +67,7 @@ public class UpdateStreamRequestBody extends RequestBody implements Closeable {
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+    public void writeTo(@NonNull BufferedSink sink) throws IOException {
         sink.writeAll(mSource);
     }
 
@@ -75,6 +80,7 @@ public class UpdateStreamRequestBody extends RequestBody implements Closeable {
         mSource.close();
     }
 
+    @Nullable
     public String getKeyName() {
         return mKeyName;
     }

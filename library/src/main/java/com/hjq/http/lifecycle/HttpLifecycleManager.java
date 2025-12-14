@@ -1,6 +1,7 @@
 package com.hjq.http.lifecycle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -17,14 +18,17 @@ public final class HttpLifecycleManager implements LifecycleEventObserver {
     /**
      * 绑定组件的生命周期
      */
-    public static void register(LifecycleOwner lifecycleOwner) {
+    public static void register(@Nullable LifecycleOwner lifecycleOwner) {
+        if (lifecycleOwner == null) {
+            return;
+        }
         lifecycleOwner.getLifecycle().addObserver(new HttpLifecycleManager());
     }
 
     /**
      * 判断宿主是否处于活动状态
      */
-    public static boolean isLifecycleActive(LifecycleOwner lifecycleOwner) {
+    public static boolean isLifecycleActive(@Nullable LifecycleOwner lifecycleOwner) {
         return lifecycleOwner != null && lifecycleOwner.getLifecycle().getCurrentState() != Lifecycle.State.DESTROYED;
     }
 

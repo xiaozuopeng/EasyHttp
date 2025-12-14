@@ -100,9 +100,4 @@ public final class CallProxy implements Call {
     public <T> T tag(@NonNull Class<T> type, @NonNull Function0<? extends T> computeIfAbsent) {
         return mRealCall.tag(type, computeIfAbsent);
     }
-
-    public interface Factory {
-
-        CallProxy create();
-    }
 }

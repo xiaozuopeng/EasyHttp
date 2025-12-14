@@ -1,5 +1,7 @@
 package com.hjq.http.model;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyConfig;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,26 +16,28 @@ import java.util.Set;
 public final class HttpParams {
 
     /** 请求参数存放集合 */
+    @NonNull
     private final Map<String, Object> mParams = new HashMap<>(EasyConfig.getInstance().getParams());
 
     /** 是否有流参数 */
     private boolean mMultipart;
 
-    public void put(String key, Object value) {
+    public void put(@Nullable String key, @Nullable Object value) {
         if (key == null || value == null) {
             return;
         }
         mParams.put(key, value);
     }
 
-    public void remove(String key) {
+    public void remove(@Nullable String key) {
         if (key == null) {
             return;
         }
         mParams.remove(key);
     }
 
-    public Object get(String key) {
+    @Nullable
+    public Object get(@Nullable String key) {
         return mParams.get(key);
     }
 
@@ -45,10 +49,12 @@ public final class HttpParams {
         return mParams.isEmpty();
     }
 
+    @NonNull
     public Set<String> getKeys() {
         return mParams.keySet();
     }
 
+    @NonNull
     public Map<String, Object> getMap() {
         return mParams;
     }

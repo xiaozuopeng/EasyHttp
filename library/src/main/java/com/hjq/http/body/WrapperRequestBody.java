@@ -1,6 +1,7 @@
 package com.hjq.http.body;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import java.io.IOException;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -14,31 +15,34 @@ import okio.BufferedSink;
  */
 public class WrapperRequestBody extends RequestBody {
 
-   private final RequestBody mRequestBody;
+    @NonNull
+    private final RequestBody mRealRequestBody;
 
-   public WrapperRequestBody(RequestBody body) {
-      mRequestBody = body;
-   }
+    public WrapperRequestBody(@NonNull RequestBody realRequestBody) {
+        mRealRequestBody = realRequestBody;
+    }
 
-   @Override
-   public long contentLength() throws IOException {
-      return mRequestBody.contentLength();
-   }
+    @Override
+    public long contentLength() throws IOException {
+        return mRealRequestBody.contentLength();
+    }
 
-   @Override
-   public MediaType contentType() {
-      return mRequestBody.contentType();
-   }
+    @Nullable
+    @Override
+    public MediaType contentType() {
+        return mRealRequestBody.contentType();
+    }
 
-   @Override
-   public void writeTo(@NonNull BufferedSink sink) throws IOException {
-      mRequestBody.writeTo(sink);
-   }
+    @Override
+    public void writeTo(@NonNull BufferedSink sink) throws IOException {
+        mRealRequestBody.writeTo(sink);
+    }
 
-   /**
-    * 获取当前的 RequestBody
-    */
-   public RequestBody getRequestBody() {
-      return mRequestBody;
-   }
+    /**
+     * 获取当前的 RequestBody
+     */
+    @NonNull
+    public RequestBody getRealRequestBody() {
+        return mRealRequestBody;
+    }
 }

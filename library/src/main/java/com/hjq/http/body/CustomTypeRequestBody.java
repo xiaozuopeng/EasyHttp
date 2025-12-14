@@ -1,5 +1,7 @@
 package com.hjq.http.body;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
@@ -12,10 +14,11 @@ import okhttp3.RequestBody;
 public class CustomTypeRequestBody extends WrapperRequestBody {
 
    /** 内容类型 */
+   @Nullable
    private MediaType mContentType;
 
-   public CustomTypeRequestBody(RequestBody body) {
-      super(body);
+   public CustomTypeRequestBody(@NonNull RequestBody realRequestBody) {
+      super(realRequestBody);
    }
 
    @Override
@@ -29,7 +32,7 @@ public class CustomTypeRequestBody extends WrapperRequestBody {
    /**
     * 设置内容的类型
     */
-   public void setContentType(MediaType type) {
+   public void setContentType(@Nullable MediaType type) {
       mContentType = type;
    }
 }

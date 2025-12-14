@@ -177,6 +177,10 @@ public final class EasyUtils {
      */
     public static boolean isMultipartParameter(List<Field> fields) {
         for (Field field : fields) {
+            if (field == null) {
+                continue;
+            }
+
             // 允许访问私有字段
             field.setAccessible(true);
 
@@ -336,6 +340,9 @@ public final class EasyUtils {
         Field[] fields = object.getClass().getDeclaredFields();
         HashMap<String, Object> data = new HashMap<>(fields.length);
         for (Field field : fields) {
+            if (field == null) {
+                continue;
+            }
             // 允许访问私有字段
             field.setAccessible(true);
 
@@ -405,6 +412,7 @@ public final class EasyUtils {
     /**
      * 获取对象上面的泛型
      */
+    @Nullable
     public static Type getGenericType(Object object) {
         if (object == null) {
             return Void.class;
@@ -529,7 +537,8 @@ public final class EasyUtils {
     /**
      * 获取文件的 md5
      */
-    public static String getFileMd5(InputStream inputStream) {
+    @Nullable
+    public static String getFileMd5(@Nullable InputStream inputStream) {
         if (inputStream == null) {
             return "";
         }
@@ -562,7 +571,8 @@ public final class EasyUtils {
     /**
      * 打开文件的输入流
      */
-    public static InputStream openFileInputStream(File file) throws FileNotFoundException {
+    @Nullable
+    public static InputStream openFileInputStream(@NonNull File file) throws FileNotFoundException {
         if (file instanceof FileContentResolver) {
             return ((FileContentResolver) file).openInputStream();
         }
@@ -572,7 +582,8 @@ public final class EasyUtils {
     /**
      * 打开文件的输出流
      */
-    public static OutputStream openFileOutputStream(File file) throws FileNotFoundException {
+    @Nullable
+    public static OutputStream openFileOutputStream(@NonNull File file) throws FileNotFoundException {
         return openFileOutputStream(file, false);
     }
 
@@ -582,7 +593,8 @@ public final class EasyUtils {
      * @param file              文件对象
      * @param append            是否追加内容
      */
-    public static OutputStream openFileOutputStream(File file, boolean append) throws FileNotFoundException {
+    @Nullable
+    public static OutputStream openFileOutputStream(@NonNull File file, boolean append) throws FileNotFoundException {
         if (file instanceof FileContentResolver) {
             return ((FileContentResolver) file).openOutputStream(append);
         }
@@ -592,7 +604,10 @@ public final class EasyUtils {
     /**
      * 判断一个字段是否是常量字段
      */
-    public static boolean isConstantField(Field field) {
+    public static boolean isConstantField(@Nullable Field field) {
+        if (field == null) {
+            return false;
+        }
         int modifiers = field.getModifiers();
         // 如果这是一个常量字段，则直接忽略掉，例如 Parcelable 接口中的 CREATOR 字段
         // https://github.com/getActivity/EasyHttp/issues/112
@@ -625,10 +640,14 @@ public final class EasyUtils {
     /**
      * 寻找真实的 RequestBody
      */
-    public static RequestBody findRealRequestBody(RequestBody body) {
+    @Nullable
+    public static RequestBody findRealRequestBody(@Nullable RequestBody body) {
+        if (body == null) {
+            return null;
+        }
         while (true) {
             if (body instanceof WrapperRequestBody) {
-                body = ((WrapperRequestBody) body).getRequestBody();
+                body = ((WrapperRequestBody) body).getRealRequestBody();
             } else {
                 return body;
             }

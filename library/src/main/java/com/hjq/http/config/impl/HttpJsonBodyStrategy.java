@@ -1,5 +1,6 @@
 package com.hjq.http.config.impl;
 
+import androidx.annotation.NonNull;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.body.JsonRequestBody;
 import com.hjq.http.config.IHttpBodyStrategy;
@@ -16,13 +17,14 @@ import okhttp3.RequestBody;
 public class HttpJsonBodyStrategy implements IHttpBodyStrategy {
 
     @Override
-    public void addParams(HttpParams params, String key, Object value) {
+    public void addParams(@NonNull HttpParams params, String key, Object value) {
         // Json 提交
         params.put(key, EasyUtils.convertObject(value));
     }
 
+    @NonNull
     @Override
-    public RequestBody createRequestBody(HttpRequest<?> httpRequest, HttpParams params) {
+    public RequestBody createRequestBody(@NonNull HttpRequest<?> httpRequest, @NonNull HttpParams params) {
         return new JsonRequestBody(params.getMap());
     }
 }

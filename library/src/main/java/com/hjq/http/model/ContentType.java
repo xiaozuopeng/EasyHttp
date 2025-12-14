@@ -1,10 +1,9 @@
 package com.hjq.http.model;
 
 import android.text.TextUtils;
-
+import androidx.annotation.NonNull;
 import java.net.FileNameMap;
 import java.net.URLConnection;
-
 import okhttp3.MediaType;
 
 /**
@@ -16,15 +15,19 @@ import okhttp3.MediaType;
 public final class ContentType {
 
     /** Http 请求 key */
+    @NonNull
     public static final String HTTP_HEAD_KEY = "Content-Type";
 
     /** 字节流 */
+    @NonNull
     public static final MediaType STREAM = MediaType.parse("application/octet-stream");
 
     /** Json */
+    @NonNull
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     /** 纯文本 */
+    @NonNull
     public static final MediaType TEXT = MediaType.parse("text/plain; charset=utf-8");
 
     /**

@@ -27,12 +27,14 @@ public abstract class UrlRequest<T extends UrlRequest<?>> extends HttpRequest<T>
     }
 
     @Override
-    protected void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void addHttpParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value,
+                                 @NonNull IHttpBodyStrategy bodyStrategy) {
         params.put(key, value);
     }
 
     @Override
-    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+    protected void addRequestParams(@NonNull Request.Builder requestBuilder, @NonNull HttpParams params,
+                                    @Nullable String contentType, @NonNull IHttpBodyStrategy bodyStrategy) {
         HttpUrl.Builder urlBuilder = requestBuilder.build().url().newBuilder();
         // 添加参数
         if (!params.isEmpty()) {
@@ -72,7 +74,7 @@ public abstract class UrlRequest<T extends UrlRequest<?>> extends HttpRequest<T>
     }
 
     @Override
-    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void printRequestLog(@NonNull Request request, HttpParams params, @NonNull HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
         if (!EasyConfig.getInstance().isLogEnabled()) {
             return;
         }

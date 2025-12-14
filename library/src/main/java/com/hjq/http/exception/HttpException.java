@@ -11,27 +11,30 @@ import androidx.annotation.Nullable;
  */
 public class HttpException extends Exception {
 
+    @NonNull
     private String mMessage;
+    @Nullable
     private Throwable mThrowable;
 
-    public HttpException(String message) {
+    public HttpException(@NonNull String message) {
         super(message);
         mMessage = message;
     }
 
-    public HttpException(String message, Throwable cause) {
+    public HttpException(@NonNull String message, @NonNull Throwable cause) {
         super(message, cause);
         mMessage = message;
         mThrowable = cause;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(@NonNull String message) {
         mMessage = message;
     }
 
     /**
      * 获取错误信息
      */
+    @NonNull
     @Override
     public String getMessage() {
         return mMessage;

@@ -209,7 +209,8 @@ public final class DownloadRequest extends HttpRequest<DownloadRequest> {
 
     @NonNull
     @Override
-    protected Request createRequest(String url, String tag, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected Request createRequest(@NonNull String url, String tag, @NonNull HttpParams params,
+                                    @NonNull HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
         if (mResumableTransfer && mFile.isFile() && mFile.length() > 0) {
             // 添加断点续传请求头
             headers.put("Range", "bytes=" + mFile.length() + "-");
@@ -219,17 +220,20 @@ public final class DownloadRequest extends HttpRequest<DownloadRequest> {
     }
 
     @Override
-    protected void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void addHttpParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value,
+                                 @NonNull IHttpBodyStrategy bodyStrategy) {
         mRealRequest.addHttpParams(params, key, value, bodyStrategy);
     }
 
     @Override
-    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+    protected void addRequestParams(@NonNull Request.Builder requestBuilder, @NonNull HttpParams params,
+                                    @Nullable String contentType, @NonNull IHttpBodyStrategy bodyStrategy) {
         mRealRequest.addRequestParams(requestBuilder, params, contentType, bodyStrategy);
     }
 
     @Override
-    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void printRequestLog(@NonNull Request request, HttpParams params, @NonNull HttpHeaders headers,
+                                   @NonNull IHttpBodyStrategy bodyStrategy) {
         mRealRequest.printRequestLog(request, params, headers, bodyStrategy);
     }
 }

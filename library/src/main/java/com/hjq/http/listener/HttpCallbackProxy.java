@@ -1,6 +1,7 @@
 package com.hjq.http.listener;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.config.IRequestApi;
 
 /**
@@ -12,9 +13,10 @@ import com.hjq.http.config.IRequestApi;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class HttpCallbackProxy<T> implements OnHttpListener<T> {
 
+    @Nullable
     private final OnHttpListener mSourceListener;
 
-    public HttpCallbackProxy(OnHttpListener listener) {
+    public HttpCallbackProxy(@Nullable OnHttpListener listener) {
         mSourceListener = listener;
     }
 

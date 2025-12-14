@@ -1,6 +1,8 @@
 package com.hjq.http.config.impl;
 
 import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyLog;
 import com.hjq.http.body.UpdateStreamRequestBody;
 import com.hjq.http.config.IHttpBodyStrategy;
@@ -27,13 +29,14 @@ import okio.Okio;
 public class HttpFormBodyStrategy implements IHttpBodyStrategy {
 
     @Override
-    public void addParams(HttpParams params, String key, Object value) {
+    public void addParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value) {
         // 表单提交
         params.put(key, value);
     }
 
+    @NonNull
     @Override
-    public RequestBody createRequestBody(HttpRequest<?> httpRequest, HttpParams params) {
+    public RequestBody createRequestBody(@NonNull HttpRequest<?> httpRequest, @NonNull HttpParams params) {
         if (!params.isEmpty() && params.isMultipart())  {
             return createMultipartRequestBody(httpRequest, params);
         }

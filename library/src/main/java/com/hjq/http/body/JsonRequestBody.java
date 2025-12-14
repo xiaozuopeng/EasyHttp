@@ -21,29 +21,31 @@ import org.json.JSONObject;
 public class JsonRequestBody extends RequestBody {
 
     /** Json 数据 */
+    @NonNull
     private final String mJson;
     /** 字节数组 */
+    @NonNull
     private final byte[] mBytes;
 
-    public JsonRequestBody(Map<?, ?> map) {
+    public JsonRequestBody(@NonNull Map<?, ?> map) {
         this(new JSONObject(map));
     }
 
-    public JsonRequestBody(List<?> list) {
+    public JsonRequestBody(@NonNull List<?> list) {
         this(new JSONArray(list));
     }
 
-    public JsonRequestBody(JSONObject jsonObject) {
+    public JsonRequestBody(@NonNull JSONObject jsonObject) {
         mJson = EasyUtils.unescapeJson(jsonObject.toString());
         mBytes = mJson.getBytes();
     }
 
-    public JsonRequestBody(JSONArray jsonArray) {
+    public JsonRequestBody(@NonNull JSONArray jsonArray) {
         mJson = EasyUtils.unescapeJson(jsonArray.toString());
         mBytes = mJson.getBytes();
     }
 
-    public JsonRequestBody(String json) {
+    public JsonRequestBody(@NonNull String json) {
         mJson = json;
         mBytes = mJson.getBytes();
     }

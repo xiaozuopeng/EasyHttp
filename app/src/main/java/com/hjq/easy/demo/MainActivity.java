@@ -2,15 +2,17 @@ package com.hjq.easy.demo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -18,6 +20,7 @@ import androidx.core.content.FileProvider;
 import com.hjq.bar.OnTitleBarListener;
 import com.hjq.bar.TitleBar;
 import com.hjq.easy.demo.http.api.SearchAuthorApi;
+import com.hjq.easy.demo.http.api.SearchAuthorApi.Bean;
 import com.hjq.easy.demo.http.api.SearchBlogsApi;
 import com.hjq.easy.demo.http.api.UpdateImageApi;
 import com.hjq.easy.demo.http.model.HttpData;
@@ -44,7 +47,7 @@ import java.util.List;
  *    time   : 2019/05/19
  *    desc   : 网络请求示例
  */
-public final class MainActivity extends BaseActivity implements View.OnClickListener {
+public final class MainActivity extends BaseActivity implements OnClickListener {
 
     private ProgressBar mProgressBar;
 
@@ -109,10 +112,10 @@ public final class MainActivity extends BaseActivity implements View.OnClickList
             EasyHttp.get(this)
                     .api(new SearchAuthorApi()
                             .setId(190000))
-                    .request(new HttpCallbackProxy<HttpData<List<SearchAuthorApi.Bean>>>(this) {
+                    .request(new HttpCallbackProxy<HttpData<List<Bean>>>(this) {
 
                         @Override
-                        public void onHttpSuccess(@NonNull HttpData<List<SearchAuthorApi.Bean>> result) {
+                        public void onHttpSuccess(@NonNull HttpData<List<Bean>> result) {
                             Toaster.show(getString(R.string.toast_get_success));
                         }
                     });
@@ -179,12 +182,17 @@ public final class MainActivity extends BaseActivity implements View.OnClickList
                 // 生成图片到本地
                 try {
                     Drawable drawable = ContextCompat.getDrawable(this, R.drawable.bg_material);
-                    OutputStream outputStream = EasyUtils.openFileOutputStream(file);
-                    if (((BitmapDrawable) drawable).getBitmap().compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
-                        outputStream.flush();
+                    if (drawable instanceof BitmapDrawable) {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+                        OutputStream outputStream = EasyUtils.openFileOutputStream(file);
+                        if (outputStream != null) {
+                            if (bitmapDrawable.getBitmap().compress(CompressFormat.PNG, 100, outputStream)) {
+                                outputStream.flush();
+                            }
+                            // 通知系统多媒体扫描该文件，否则会导致拍摄出来的图片或者视频没有及时显示到相册中，而需要通过重启手机才能看到
+                            MediaScannerConnection.scanFile(this, new String[]{file.getPath()}, null, null);
+                        }
                     }
-                    // 通知系统多媒体扫描该文件，否则会导致拍摄出来的图片或者视频没有及时显示到相册中，而需要通过重启手机才能看到
-                    MediaScannerConnection.scanFile(this, new String[]{file.getPath()}, null, null);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -309,7 +317,7 @@ public final class MainActivity extends BaseActivity implements View.OnClickList
                 }
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 Uri uri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (VERSION.SDK_INT >= VERSION_CODES.N) {
                     if (file instanceof FileContentResolver) {
                         uri = ((FileContentResolver) file).getContentUri();
                     } else {

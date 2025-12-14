@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -21,24 +21,26 @@ public final class ActivityLifecycle implements
         LifecycleOwner, LifecycleEventObserver,
         Application.ActivityLifecycleCallbacks {
 
+    @NonNull
     private final LifecycleRegistry mLifecycle = new LifecycleRegistry(this);
 
+    @Nullable
     private Activity mActivity;
 
     public ActivityLifecycle(@NonNull Activity activity) {
         mActivity = activity;
 
-        if (mActivity instanceof LifecycleOwner) {
-            ((LifecycleOwner) mActivity).getLifecycle().addObserver(this);
+        if (activity instanceof LifecycleOwner) {
+            ((LifecycleOwner) activity).getLifecycle().addObserver(this);
             return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            mActivity.registerActivityLifecycleCallbacks(this);
+            activity.registerActivityLifecycleCallbacks(this);
             return;
         }
 
-        mActivity.getApplication().registerActivityLifecycleCallbacks(this);
+        activity.getApplication().registerActivityLifecycleCallbacks(this);
     }
 
     /**
@@ -70,7 +72,7 @@ public final class ActivityLifecycle implements
      */
 
     @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
         if (mActivity != activity) {
             return;
         }
@@ -78,7 +80,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivityStarted(Activity activity) {
+    public void onActivityStarted(@NonNull Activity activity) {
         if (mActivity != activity) {
             return;
         }
@@ -86,7 +88,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivityResumed(Activity activity) {
+    public void onActivityResumed(@NonNull Activity activity) {
         if (mActivity != activity) {
             return;
         }
@@ -94,7 +96,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {
+    public void onActivityPaused(@NonNull Activity activity) {
         if (mActivity != activity) {
             return;
         }
@@ -102,7 +104,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivityStopped(Activity activity) {
+    public void onActivityStopped(@NonNull Activity activity) {
         if (mActivity != activity) {
             return;
         }
@@ -110,7 +112,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivityDestroyed(Activity activity) {
+    public void onActivityDestroyed(@NonNull Activity activity) {
         if (mActivity != activity) {
             return;
         }
@@ -125,5 +127,7 @@ public final class ActivityLifecycle implements
     }
 
     @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+        // default implementation ignored
+    }
 }

@@ -26,25 +26,29 @@ import okhttp3.RequestBody;
  */
 public class FileContentResolver extends File {
 
+    @NonNull
     private final ContentResolver mContentResolver;
+    @NonNull
     private final Uri mContentUri;
 
+    @Nullable
     private MediaType mContentType;
+    @Nullable
     private String mFileName;
 
-    public FileContentResolver(Context context, Uri uri) {
-        this(context.getContentResolver(), uri);
+    public FileContentResolver(@NonNull Context context, @NonNull Uri contentUri) {
+        this(context.getContentResolver(), contentUri);
     }
 
-    public FileContentResolver(ContentResolver resolver, Uri uri) {
-        this(resolver, uri, null);
+    public FileContentResolver(@NonNull ContentResolver resolver, @NonNull Uri contentUri) {
+        this(resolver, contentUri, null);
     }
 
-    public FileContentResolver(Context context, Uri uri, String fileName) {
+    public FileContentResolver(@NonNull Context context, @NonNull Uri uri, @Nullable String fileName) {
         this(context.getContentResolver(), uri, fileName);
     }
 
-    public FileContentResolver(ContentResolver resolver, Uri uri, String fileName) {
+    public FileContentResolver(@NonNull ContentResolver resolver, @NonNull Uri uri, @Nullable String fileName) {
         super(new File(uri.toString()).getPath());
         mContentResolver = resolver;
         // 请注意这个 uri 需要通过 ContentResolver.insert 方法生成的，并且没有经过修改的，否则会导致文件流读取失败
@@ -60,15 +64,24 @@ public class FileContentResolver extends File {
     }
 
     /**
+     * 获取内容的 uri
+     */
+    @NonNull
+    public Uri getContentUri() {
+        return mContentUri;
+    }
+
+    /**
      * 设置真实的文件名（用于 {@link okhttp3.MultipartBody.Builder#addFormDataPart(String, String, RequestBody)} 方法中的 fileName 属性）
      */
-    public void setFileName(String fileName) {
+    public void setFileName(@Nullable String fileName) {
         mFileName = fileName;
     }
 
     /**
      * 获取真实的文件名
      */
+    @Nullable
     public String getFileName() {
         return mFileName;
     }
@@ -76,27 +89,22 @@ public class FileContentResolver extends File {
     /**
      * 设置内容类型（用于 {@link RequestBody#contentType()} 方法）
      */
-    public void setContentType(MediaType type) {
+    public void setContentType(@Nullable MediaType type) {
         mContentType = type;
     }
 
     /**
      * 获取内容类型
      */
+    @Nullable
     public MediaType getContentType() {
         return mContentType;
     }
 
     /**
-     * 获取内容的 uri
-     */
-    public Uri getContentUri() {
-        return mContentUri;
-    }
-
-    /**
      * 打开文件输入流
      */
+    @Nullable
     public InputStream openInputStream() throws FileNotFoundException {
         return mContentResolver.openInputStream(mContentUri);
     }
@@ -104,6 +112,7 @@ public class FileContentResolver extends File {
     /**
      * 打开文件输出流
      */
+    @Nullable
     public OutputStream openOutputStream(boolean append) throws FileNotFoundException {
         // w：写入模式，如果文件存在则覆盖，如果文件不存在则创建
         // wa：追加模式，如果文件存在则追加到文件末尾，如果文件不存在则创建

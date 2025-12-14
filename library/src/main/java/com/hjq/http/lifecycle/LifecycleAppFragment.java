@@ -2,7 +2,6 @@ package com.hjq.http.lifecycle;
 
 import android.app.Fragment;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
@@ -18,6 +17,7 @@ import androidx.lifecycle.LifecycleRegistry;
 @SuppressWarnings("deprecation")
 public class LifecycleAppFragment extends Fragment implements LifecycleOwner {
 
+    @NonNull
     private final LifecycleRegistry mLifecycle = new LifecycleRegistry(this);
 
     @NonNull

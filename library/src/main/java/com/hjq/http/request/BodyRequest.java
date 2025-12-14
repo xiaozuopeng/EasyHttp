@@ -97,18 +97,21 @@ public abstract class BodyRequest<T extends BodyRequest<?>> extends HttpRequest<
     }
 
     @Override
-    protected void addHttpParams(HttpParams params, String key, Object value, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void addHttpParams(@NonNull HttpParams params, @Nullable String key, @Nullable Object value,
+                                 @NonNull IHttpBodyStrategy bodyStrategy) {
         bodyStrategy.addParams(params, key, value);
     }
 
     @Override
-    protected void addRequestParams(Request.Builder requestBuilder, HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+    protected void addRequestParams(@NonNull Request.Builder requestBuilder, @NonNull HttpParams params,
+                                    @Nullable String contentType, @NonNull IHttpBodyStrategy bodyStrategy) {
         RequestBody body = mRequestBody != null ? mRequestBody : createRequestBody(params, contentType, bodyStrategy);
         requestBuilder.method(getRequestMethod(), body);
     }
 
     @Override
-    protected void printRequestLog(Request request, HttpParams params, HttpHeaders headers, @NonNull IHttpBodyStrategy bodyStrategy) {
+    protected void printRequestLog(@NonNull Request request, HttpParams params, @NonNull HttpHeaders headers,
+                                   @NonNull IHttpBodyStrategy bodyStrategy) {
         if (!EasyConfig.getInstance().isLogEnabled()) {
             return;
         }
@@ -181,7 +184,8 @@ public abstract class BodyRequest<T extends BodyRequest<?>> extends HttpRequest<
     /**
      * 组装 RequestBody 对象
      */
-    private RequestBody createRequestBody(HttpParams params, @Nullable String contentType, IHttpBodyStrategy bodyStrategy) {
+    private RequestBody createRequestBody(@NonNull HttpParams params, @Nullable String contentType,
+                                          @NonNull IHttpBodyStrategy bodyStrategy) {
         RequestBody requestBody = bodyStrategy.createRequestBody(this, params);
 
         // 如果外层需要自定义 Content-Type 这个字段，那么就使用装饰设计模式，对原有的 RequestBody 对象进行扩展

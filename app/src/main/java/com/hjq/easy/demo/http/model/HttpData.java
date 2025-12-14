@@ -1,5 +1,6 @@
 package com.hjq.easy.demo.http.model;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.Map;
 
@@ -17,8 +18,11 @@ public class HttpData<T> {
 
     /** 返回码 */
     private int errorCode;
+
     /** 提示语 */
+    @Nullable
     private String errorMsg;
+
     /** 数据 */
     @Nullable
     private T data;
@@ -36,7 +40,11 @@ public class HttpData<T> {
         return errorCode;
     }
 
+    @NonNull
     public String getMessage() {
+        if (errorMsg == null) {
+            return "";
+        }
         return errorMsg;
     }
 

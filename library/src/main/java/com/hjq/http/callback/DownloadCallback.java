@@ -2,10 +2,12 @@ package com.hjq.http.callback;
 
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.hjq.http.EasyLog;
 import com.hjq.http.EasyUtils;
 import com.hjq.http.config.IRequestInterceptor;
 import com.hjq.http.exception.FileMd5Exception;
+import com.hjq.http.exception.FileStreamException;
 import com.hjq.http.exception.NullBodyException;
 import com.hjq.http.exception.ResponseException;
 import com.hjq.http.lifecycle.HttpLifecycleManager;
@@ -35,6 +37,7 @@ public final class DownloadCallback extends BaseCallback {
     private final HttpRequest<?> mHttpRequest;
 
     /** 文件 MD5 正则表达式 */
+    @NonNull
     private static final String FILE_MD5_REGEX = "^[\\w]{32}$";
 
     /** 保存的文件 */
@@ -42,15 +45,19 @@ public final class DownloadCallback extends BaseCallback {
     private final File mFile;
 
     /** 校验的 MD5 */
+    @Nullable
     private String mMd5;
 
     /** 下载监听回调 */
+    @Nullable
     private OnDownloadListener mListener;
 
     /** 下载总字节 */
+    @NonNull
     private final AtomicLong mTotalByte = new AtomicLong();
 
     /** 已下载字节 */
+    @NonNull
     private final AtomicLong mDownloadByte = new AtomicLong();
 
     /** 下载进度 */
@@ -65,12 +72,12 @@ public final class DownloadCallback extends BaseCallback {
         mFile = file;
     }
 
-    public DownloadCallback setMd5(String md5) {
+    public DownloadCallback setMd5(@Nullable String md5) {
         mMd5 = md5;
         return this;
     }
 
-    public DownloadCallback setListener(OnDownloadListener listener) {
+    public DownloadCallback setListener(@Nullable OnDownloadListener listener) {
         mListener = listener;
         return this;
     }
@@ -86,28 +93,29 @@ public final class DownloadCallback extends BaseCallback {
     }
 
     @Override
-    protected void onHttpResponse(Response response) throws Throwable {
+    protected void onHttpResponse(@NonNull Response response) throws Throwable {
         // 打印请求耗时时间
-        EasyLog.printLog(mHttpRequest, "RequestConsuming：" +
-                (response.receivedResponseAtMillis() - response.sentRequestAtMillis()) + " ms");
+        EasyLog.printLog(mHttpRequest, "RequestConsuming：" + (response.receivedResponseAtMillis() - response.sentRequestAtMillis()) + " ms");
 
         // 响应码 416 表示请求的范围不符合要求，这通常发生在使用断点续传（Range请求头）时，服务器无法满足请求的范围条件，造成这个问题的原因可能有以下几种：
         // 1. 范围请求错误：请求头中的Range字段可能设置了无效的范围。请确保你设置的范围是有效的，且在文件范围内
         // 2. 服务器不支持范围请求：有些服务器不支持范围请求，尤其是对于静态文件服务。在这种情况下，服务器可能会返回 416 错误
         // 3. 服务器不允许断点续传：即使服务器支持范围请求，也可能配置为不允许断点续传。这可能是出于性能或其他原因的考虑
         if (response.code() == 416 && !TextUtils.isEmpty(response.request().header("Range"))) {
-            Request request = response.request().newBuilder().removeHeader("Range").build();
             CallProxy callProxy = getCallProxy();
-            Call newCall = mHttpRequest.getRequestHttpClient().getOkHttpClient().newCall(request);
-            callProxy.setRealCall(newCall);
-            Response newResponse = callProxy.execute();
-            // 打印请求耗时时间
-            EasyLog.printLog(mHttpRequest, "The response status code is 416" +
-                ", response message: " + response.message() + ", require special treatment" +
-                ", re-initiate a new request，new request consuming：" +
-                (newResponse.receivedResponseAtMillis() - newResponse.sentRequestAtMillis()) + " ms");
-            // 替换之前的 Response 对象
-            response = newResponse;
+            if (callProxy != null) {
+                Request request = response.request().newBuilder().removeHeader("Range").build();
+                Call newCall = mHttpRequest.getRequestHttpClient().getOkHttpClient().newCall(request);
+                callProxy.setRealCall(newCall);
+                Response newResponse = callProxy.execute();
+                // 打印请求耗时时间
+                EasyLog.printLog(mHttpRequest, "The response status code is 416" +
+                    ", response message: " + response.message() + ", require special treatment" +
+                    ", re-initiate a new request，new request consuming：" +
+                    (newResponse.receivedResponseAtMillis() - newResponse.sentRequestAtMillis()) + " ms");
+                // 替换之前的 Response 对象
+                response = newResponse;
+            }
         }
 
         IRequestInterceptor interceptor = mHttpRequest.getRequestInterceptor();
@@ -177,6 +185,10 @@ public final class DownloadCallback extends BaseCallback {
         InputStream responeInputStream = body.byteStream();
 
         OutputStream fileOutputStream = EasyUtils.openFileOutputStream(mFile, supportResumableTransfer);
+        if (fileOutputStream == null) {
+            throw new FileStreamException("File output stream is null");
+        }
+
         if (supportResumableTransfer) {
             mDownloadByte.addAndGet(fileLength);
             // 有一些响应头没有返回 Content-Length 请求头，会导致总字节数为 0
@@ -199,17 +211,19 @@ public final class DownloadCallback extends BaseCallback {
         EasyUtils.closeStream(fileOutputStream);
         EasyUtils.closeStream(response);
 
-        String md5 = EasyUtils.getFileMd5(EasyUtils.openFileInputStream(mFile));
-        if (mMd5 != null && !mMd5.isEmpty() && !mMd5.equalsIgnoreCase(md5)) {
-            // 文件 MD5 值校验失败
-            throw new FileMd5Exception("File md5 hash verify failure", md5);
+        if (!TextUtils.isEmpty(mMd5)) {
+            String md5 = EasyUtils.getFileMd5(EasyUtils.openFileInputStream(mFile));
+            if (!TextUtils.isEmpty(md5) && !mMd5.equalsIgnoreCase(md5)) {
+                // 文件 MD5 值校验失败
+                throw new FileMd5Exception("File md5 hash verify failure", md5);
+            }
         }
 
         EasyUtils.runOnAssignThread(mHttpRequest.getThreadSchedulers(), () -> dispatchDownloadSuccessCallback(false));
     }
 
     @Override
-    protected void onHttpFailure(final Throwable throwable) {
+    protected void onHttpFailure(@NonNull final Throwable throwable) {
         EasyLog.printThrowable(mHttpRequest, throwable);
         // 打印错误堆栈
         final Throwable finalThrowable = mHttpRequest.getRequestHandler().downloadFail(mHttpRequest, throwable);
@@ -261,7 +275,7 @@ public final class DownloadCallback extends BaseCallback {
         EasyLog.printLog(mHttpRequest,  "Download file success, file path = " + mFile.getPath());
     }
 
-    public void dispatchDownloadFailCallback(Throwable throwable) {
+    public void dispatchDownloadFailCallback(@NonNull Throwable throwable) {
         if (mListener != null && HttpLifecycleManager.isLifecycleActive(mHttpRequest.getLifecycleOwner())) {
             mListener.onDownloadFail(mFile, throwable);
             mListener.onDownloadEnd(mFile);
