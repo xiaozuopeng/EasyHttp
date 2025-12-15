@@ -61,9 +61,8 @@ public final class NormalCallback extends BaseCallback {
             return;
         }
 
-        Type reflectType = mReflectType != null ? mReflectType : Void.TYPE;
-
         try {
+            Type reflectType = mReflectType != null ? mReflectType : Object.class;
             Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest, reflectType,
                                                                           mHttpRequest.getRequestCacheConfig().getCacheTime());
             EasyLog.printLog(mHttpRequest, "ReadCache result：" + result);
@@ -115,9 +114,9 @@ public final class NormalCallback extends BaseCallback {
             response = interceptor.interceptResponse(mHttpRequest, response);
         }
 
+        Type reflectType = mReflectType != null ? mReflectType : Object.class;
         // 解析 Bean 类对象
-        final Object result = mHttpRequest.getRequestHandler().requestSuccess(
-                mHttpRequest, response, mReflectType);
+        final Object result = mHttpRequest.getRequestHandler().requestSuccess(mHttpRequest, response, reflectType);
 
         CacheMode cacheMode = mHttpRequest.getRequestCacheConfig().getCacheMode();
         if (cacheMode == CacheMode.USE_CACHE_ONLY ||
@@ -142,7 +141,7 @@ public final class NormalCallback extends BaseCallback {
         // 如果设置了只在网络请求失败才去读缓存
         if (throwable instanceof IOException && mHttpRequest.getRequestCacheConfig().getCacheMode() == CacheMode.USE_CACHE_AFTER_FAILURE) {
             try {
-                Type reflectType = mReflectType != null ? mReflectType : Void.TYPE;
+                Type reflectType = mReflectType != null ? mReflectType : Object.class;
                 Object result = mHttpRequest.getHttpCacheStrategy().readCache(mHttpRequest, reflectType,
                                                                               mHttpRequest.getRequestCacheConfig().getCacheTime());
                 EasyLog.printLog(mHttpRequest, "ReadCache result：" + result);

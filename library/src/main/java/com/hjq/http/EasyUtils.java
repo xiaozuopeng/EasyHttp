@@ -434,12 +434,12 @@ public final class EasyUtils {
         // 获取父类上面的泛型
         Type genericSuperclass = object.getClass().getGenericSuperclass();
         if (!(genericSuperclass instanceof ParameterizedType)) {
-            return Void.class;
+            return Object.class;
         }
 
         Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
         if (actualTypeArguments.length == 0) {
-            return Void.class;
+            return Object.class;
         }
 
         // 如果这个对象是通过类继承，并且携带了泛型

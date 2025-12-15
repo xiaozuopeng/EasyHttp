@@ -200,7 +200,7 @@ public final class MainActivity extends BaseActivity implements OnClickListener 
 
             EasyHttp.post(this)
                     .api(new UpdateImageApi(file))
-                    .request(new OnUpdateListener<Void>() {
+                    .request(new OnUpdateListener<Object>() {
 
                         @Override
                         public void onUpdateStart(@NonNull IRequestApi api) {
@@ -214,7 +214,7 @@ public final class MainActivity extends BaseActivity implements OnClickListener 
                         }
 
                         @Override
-                        public void onUpdateSuccess(@NonNull Void result) {
+                        public void onUpdateSuccess(@NonNull Object result) {
                             Toaster.show(getString(R.string.toast_upload_success));
                         }
 

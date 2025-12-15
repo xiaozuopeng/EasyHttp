@@ -340,7 +340,7 @@ public final class UpdateImageApi implements IRequestApi, IRequestBodyType {
 ```java
 EasyHttp.post(this)
         .api(new UpdateImageApi(file))
-        .request(new OnUpdateListener<Void>() {
+        .request(new OnUpdateListener<Object>() {
 
             @Override
             public void onUpdateStart(@NonNull IRequestApi api) {
@@ -353,7 +353,7 @@ EasyHttp.post(this)
             }
 
             @Override
-            public void onUpdateSuccess(@NonNull Void result) {
+            public void onUpdateSuccess(@NonNull Object result) {
                 toast("Upload successful");
             }
 

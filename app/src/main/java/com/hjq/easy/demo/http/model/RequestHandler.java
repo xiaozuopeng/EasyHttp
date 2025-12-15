@@ -54,10 +54,6 @@ public final class RequestHandler implements IRequestHandler {
     @NonNull
     @Override
     public Object requestSuccess(@NonNull HttpRequest<?> httpRequest, @NonNull Response response, @NonNull Type type) throws Throwable {
-        if (Void.class.equals(type)) {
-            return Void.TYPE;
-        }
-
         if (Response.class.equals(type)) {
             return response;
         }
@@ -65,6 +61,10 @@ public final class RequestHandler implements IRequestHandler {
         if (!response.isSuccessful()) {
             throw new ResponseException(String.format(mApplication.getString(R.string.http_response_error),
                     response.code(), response.message()), response);
+        }
+
+        if (Object.class.equals(type)) {
+            return "";
         }
 
         if (Headers.class.equals(type)) {
@@ -115,7 +115,7 @@ public final class RequestHandler implements IRequestHandler {
 
         try {
             result = GsonFactory.getSingletonGson().fromJson(text, type);
-        } catch (JsonSyntaxException e) {
+        } catch (Exception e) {
             // 返回结果读取异常
             throw new DataException(mApplication.getString(R.string.http_data_explain_error), e);
         }
