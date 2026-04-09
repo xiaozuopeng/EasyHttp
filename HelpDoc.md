@@ -1179,7 +1179,7 @@ public final class XxxApi implements IRequestApi {
 
 ```java
 EasyHttp.post(this)
-        .api(new RequestUrl("https://xxxx.com/aaaa"))
+        .api(new SimpleRequestUrl("https://xxxx.com/aaaa"))
         .request(new HttpCallbackProxy<Xxx>(this) {
 
             @Override
