@@ -100,7 +100,7 @@ dependencies {
     }
 
     // Bugly 异常捕捉：https://bugly.tds.qq.com/docs/sdk/android/
-    implementation 'com.tencent.bugly_16kb:bugly-pro:4.4.7.3'
+    implementation 'com.tencent.bugly_16kb:bugly-pro:4.4.7.8'
 
     // 日志调试框架：https://github.com/getActivity/Logcat
     debugImplementation 'com.github.getActivity:Logcat:13.0'
