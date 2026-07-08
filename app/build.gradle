@@ -103,7 +103,7 @@ dependencies {
     implementation 'com.tencent.bugly_16kb:bugly-pro:4.4.7.8'
 
     // 日志调试框架：https://github.com/getActivity/Logcat
-    debugImplementation 'com.github.getActivity:Logcat:13.0'
+    debugImplementation 'com.github.getActivity:Logcat:13.2'
 
     // 内存泄漏监测框架：https://github.com/square/leakcanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:3.0-alpha-8'
