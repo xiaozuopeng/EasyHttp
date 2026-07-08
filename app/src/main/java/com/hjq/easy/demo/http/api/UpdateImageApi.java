@@ -16,14 +16,20 @@ public final class UpdateImageApi implements IRequestServer, IRequestApi {
     @NonNull
     @Override
     public String getHost() {
-        return "https://graph.baidu.com/";
+        return "https://api.imgbb.com/";
     }
 
     @NonNull
     @Override
     public String getApi() {
-        return "upload/";
+        return "1/upload";
     }
+
+    /** API Key */
+    private final String key = "2ff632834724a785861120d76e0980b4";
+
+    /** 图片过期时间，单位：秒，默认 60 秒 */
+    private final int expiration = 60;
 
     /** 本地图片 */
     private File image;
