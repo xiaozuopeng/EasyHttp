@@ -94,7 +94,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect:2.2.21'
 
     // 腾讯 MMKV：https://github.com/Tencent/MMKV
-    implementation ('com.tencent:mmkv-static:2.3.0') {
+    implementation ('com.tencent:mmkv-static:2.4.0') {
         // 避免版本不一致导致的依赖冲突，从而导致编译报错
         exclude group: 'androidx.annotation', module: 'annotation'
     }
