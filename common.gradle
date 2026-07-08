@@ -2,10 +2,10 @@
 android {
 
     // 编译源码版本
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
         // Android 版本适配指南：https://github.com/getActivity/AndroidVersionAdapter
-        targetSdk 34
+        targetSdk 36
         versionCode 1350
         versionName "13.5"
     }

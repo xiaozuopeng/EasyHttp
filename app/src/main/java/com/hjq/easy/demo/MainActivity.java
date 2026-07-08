@@ -3,16 +3,20 @@ package com.hjq.easy.demo;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Insets;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.View.OnApplyWindowInsetsListener;
 import android.view.View.OnClickListener;
+import android.view.WindowInsets;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -73,6 +77,21 @@ public final class MainActivity extends BaseActivity implements OnClickListener 
                 startActivity(intent);
             }
         });
+
+        // 适配 Android 15 EdgeToEdge 特性
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            titleBar.setOnApplyWindowInsetsListener(new OnApplyWindowInsetsListener()  {
+
+                @NonNull
+                @Override
+                public WindowInsets onApplyWindowInsets(@NonNull View v, @NonNull WindowInsets insets) {
+                    Insets systemBars = insets.getInsets(WindowInsets.Type.systemBars());
+                    // v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                    v.setPadding(0, systemBars.top, 0, 0);
+                    return insets;
+                }
+            });
+        }
 
         requestPermission();
     }
