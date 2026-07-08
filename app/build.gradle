@@ -79,7 +79,7 @@ dependencies {
     implementation 'com.github.getActivity:Toaster:15.0'
 
     // 权限请求框架：https://github.com/getActivity/XXPermissions
-    implementation 'com.github.getActivity:XXPermissions:28.2'
+    implementation 'com.github.getActivity:XXPermissions:28.3'
 
     // 标题栏框架：https://github.com/getActivity/TitleBar
     implementation 'com.github.getActivity:TitleBar:10.8'
