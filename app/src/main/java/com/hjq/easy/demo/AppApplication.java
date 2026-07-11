@@ -2,6 +2,7 @@ package com.hjq.easy.demo;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonToken;
 import com.hjq.easy.demo.http.model.HttpCacheStrategy;
@@ -9,7 +10,7 @@ import com.hjq.easy.demo.http.model.RequestHandler;
 import com.hjq.easy.demo.http.server.ReleaseServer;
 import com.hjq.easy.demo.http.server.TestServer;
 import com.hjq.gson.factory.GsonFactory;
-import com.hjq.gson.factory.ParseExceptionCallback;
+import com.hjq.gson.factory.OnParseExceptionCallback;
 import com.hjq.http.EasyConfig;
 import com.hjq.http.config.IRequestInterceptor;
 import com.hjq.http.config.IRequestServer;
@@ -44,20 +45,20 @@ public final class AppApplication extends Application {
         Bugly.init(this, builder);
 
         // 设置 Json 解析容错监听
-        GsonFactory.setParseExceptionCallback(new ParseExceptionCallback() {
+        GsonFactory.setOnParseExceptionCallback(new OnParseExceptionCallback() {
 
             @Override
-            public void onParseObjectException(TypeToken<?> typeToken, String fieldName, JsonToken jsonToken) {
+            public void onParseObjectException(@NonNull TypeToken<?> typeToken, @Nullable String fieldName, @Nullable JsonToken jsonToken) {
                 handlerGsonParseException("Object parsing exception: " + typeToken + "#" + fieldName + ", backend return type: " + jsonToken);
             }
 
             @Override
-            public void onParseListItemException(TypeToken<?> typeToken, String fieldName, JsonToken listItemJsonToken) {
+            public void onParseListItemException(@NonNull TypeToken<?> typeToken, @Nullable String fieldName, @Nullable JsonToken listItemJsonToken) {
                 handlerGsonParseException("List parsing exception: " + typeToken + "#" + fieldName + ", backend return item type: " + listItemJsonToken);
             }
 
             @Override
-            public void onParseMapItemException(TypeToken<?> typeToken, String fieldName, String mapItemKey, JsonToken mapItemJsonToken) {
+            public void onParseMapItemException(@NonNull TypeToken<?> typeToken, @Nullable String fieldName, @Nullable String mapItemKey, @Nullable JsonToken mapItemJsonToken) {
                 handlerGsonParseException("Map parsing exception: " + typeToken + "#" + fieldName + ", mapItemKey = " + mapItemKey + ", backend return item type: " + mapItemJsonToken);
             }
 
