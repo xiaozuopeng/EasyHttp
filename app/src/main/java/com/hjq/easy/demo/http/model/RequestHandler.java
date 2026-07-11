@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import androidx.annotation.NonNull;
-import com.google.gson.JsonSyntaxException;
 import com.hjq.easy.demo.R;
 import com.hjq.easy.demo.http.exception.ResultException;
 import com.hjq.easy.demo.http.exception.TokenException;
@@ -180,7 +179,8 @@ public final class RequestHandler implements IRequestHandler {
             return new CancelException(mApplication.getString(R.string.http_request_cancel), throwable);
         }
 
-        return new HttpException(throwable.getMessage(), throwable);
+        String message = throwable.getMessage();
+        return new HttpException(message != null ? message : "", throwable);
     }
 
     @NonNull
