@@ -168,7 +168,7 @@ public class RequestServer implements IRequestServer {
 
     @NonNull
     @Override
-    public IHttpPostBodyStrategy getBodyType() {
+    public IHttpBodyStrategy getBodyType() {
         // Parameters submitted in Json format (default is form)
         return RequestBodyType.JSON;
     }
@@ -318,7 +318,7 @@ public final class UpdateImageApi implements IRequestApi, IRequestBodyType {
 
     @NonNull
     @Override
-    public IHttpPostBodyStrategy getBodyType() {
+    public IHttpBodyStrategy getBodyType() {
         // File upload needs to use the form method
         return RequestBodyType.FORM;
     }
@@ -822,7 +822,7 @@ public class XxxServer implements IRequestServer {
 
     @NonNull
     @Override
-    public IHttpPostBodyStrategy getBodyType() {
+    public IHttpBodyStrategy getBodyType() {
         return RequestBodyType.FORM;
     }
 }
@@ -841,7 +841,7 @@ public class XxxServer implements IRequestServer {
 
     @NonNull
     @Override
-    public IHttpPostBodyStrategy getBodyType() {
+    public IHttpBodyStrategy getBodyType() {
         return RequestBodyType.JSON;
     }
 }
@@ -860,7 +860,7 @@ public final class XxxApi implements IRequestApi, IRequestBodyType {
 
     @NonNull
     @Override
-    public IHttpPostBodyStrategy getBodyType() {
+    public IHttpBodyStrategy getBodyType() {
         return RequestBodyType.JSON;
     }
 }
