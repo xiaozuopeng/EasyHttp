@@ -4,17 +4,20 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.hjq.http.EasyUtils;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
@@ -114,9 +117,41 @@ public class FileContentResolver extends File {
      */
     @Nullable
     public OutputStream openOutputStream(boolean append) throws FileNotFoundException {
-        // w：写入模式，如果文件存在则覆盖，如果文件不存在则创建
+        // wt：写入模式，如果文件存在则截断并覆盖，如果文件不存在则创建
         // wa：追加模式，如果文件存在则追加到文件末尾，如果文件不存在则创建
-        return mContentResolver.openOutputStream(mContentUri, append ? "wa" : "w");
+        // Github issue 地址：https://github.com/getActivity/EasyHttp/issues/292
+        if (append) {
+            return mContentResolver.openOutputStream(mContentUri, "wa");
+        }
+
+        try {
+            // 优先 wt：期望打开就截断清零
+            return mContentResolver.openOutputStream(mContentUri, "wt");
+        } catch (FileNotFoundException e) {
+            // 第三方 Provider 可能不识别 wt 模式，需要降级到 w 模式
+            // 降级 w 模式之后，必须手动把文件截断到 0，规避 FileContentResolver 文件尾部残留 bug
+            try (ParcelFileDescriptor parcelFileDescriptor = mContentResolver.openFileDescriptor(mContentUri, "rw")) {
+                if (parcelFileDescriptor == null) {
+                    return null;
+                }
+                try (FileInputStream fileInputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
+                    FileChannel channel = fileInputStream.getChannel()) {
+                    channel.truncate(0);
+                } catch (IOException ex) {
+                    // 截断失败，抛出异常，不要静默吞掉，不要返回 null
+                    FileNotFoundException exception = new FileNotFoundException("truncate file failed");
+                    exception.initCause(ex);
+                    throw exception;
+                }
+                // 截断成功，再打开输出流
+                return mContentResolver.openOutputStream(mContentUri, "w");
+            } catch (IOException ex) {
+                // 截断失败，抛出异常，不要静默吞掉，不要返回 null
+                FileNotFoundException exception = new FileNotFoundException("truncate file failed");
+                exception.initCause(ex);
+                throw exception;
+            }
+        }
     }
 
     @Override
